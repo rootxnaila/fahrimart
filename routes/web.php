@@ -14,3 +14,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('/dashboard', fn () => view('dashboard'))->name('dashboard');
 });
+
+Route::middleware(['auth', 'role:pemilik,admin'])
+    ->get('/uji/admin', fn () => 'Halaman khusus Pemilik dan Admin')
+    ->name('uji.admin');
+
+Route::middleware(['auth', 'role:pemilik'])
+    ->get('/uji/pemilik', fn () => 'Halaman khusus Pemilik')
+    ->name('uji.pemilik');
