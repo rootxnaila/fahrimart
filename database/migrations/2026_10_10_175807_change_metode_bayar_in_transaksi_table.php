@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
-    //payment method
+    //payment method 
     public function up(): void
     {
         if (DB::table('transaksi')->where('metode_bayar', 'Kasbon')->exists()) {
