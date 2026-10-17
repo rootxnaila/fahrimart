@@ -1,17 +1,10 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Dashboard - Fahrimart</title>
-</head>
-<body>
-    <h1>Dashboard Fahrimart</h1>
-    <p>Halo, {{ auth()->user()->nama }} ({{ auth()->user()->role }})</p>
+@extends('layouts.app')
+@section('title', 'Dashboard')
+@section('content')
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">Halo, {{ auth()->user()->nama }}.</p>
 
-    <form method="POST" action="{{ route('logout') }}">
-        @csrf
-        <button type="submit">Logout</button>
-    </form>
-</body>
-</html>
+    <div class="card-fm">
+        <p class="mb-0">Halaman kasir (produk dan keranjang) menyusul di tahap POS.</p>
+    </div>
+@endsection

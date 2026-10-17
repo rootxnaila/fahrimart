@@ -136,3 +136,271 @@
 .fm-eye:hover {
     color: #000;
 }
+
+/* ===== Kerangka aplikasi: sidebar dan konten ===== */
+.app-shell {
+    display: flex;
+    min-height: 100vh;
+    background: var(--fm-bg);
+}
+
+.app-sidebar {
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    flex: 0 0 240px;
+    width: 240px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1.25rem 1.5rem;
+    background: #fff;
+    border-radius: 0 20px 20px 0;
+    overflow-y: auto;
+}
+.app-sidebar .brand {
+    padding: 0 0.75rem;
+    margin-bottom: 2.5rem;
+}
+.app-sidebar .brand img {
+    width: 120px;
+    height: auto;
+}
+
+.nav-fm {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+.nav-fm-link {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    width: 100%;
+    padding: 0.7rem 0.75rem;
+    border: 0;
+    border-radius: 10px;
+    background: none;
+    color: var(--fm-nav-text);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: left;
+    text-decoration: none;
+}
+.nav-fm-link:hover {
+    background: var(--fm-bg);
+    color: var(--fm-nav-text);
+}
+.nav-fm-link.active {
+    background: var(--fm-green-soft);
+    color: var(--fm-green-dark);
+    font-weight: 600;
+}
+.nav-fm-link.disabled {
+    opacity: 0.45;
+    pointer-events: none;
+}
+.nav-fm-icon {
+    flex: 0 0 20px;
+    color: var(--fm-nav-icon);
+}
+.nav-fm-chevron {
+    margin-left: auto;
+    transition: transform 0.2s;
+}
+.nav-fm-link[aria-expanded="true"] .nav-fm-chevron {
+    transform: rotate(90deg);
+}
+.nav-fm-sub {
+    list-style: none;
+    margin: 0.25rem 0 0.5rem;
+    padding: 0 0 0 2.35rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+.nav-fm-sub .nav-fm-link {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+}
+
+.sidebar-user {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+.sidebar-user .name {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+.sidebar-user .role {
+    font-size: 0.8rem;
+    color: var(--fm-muted);
+    text-transform: capitalize;
+}
+
+.app-main {
+    flex: 1;
+    min-width: 0;
+    padding: 2.5rem 3rem;
+}
+.page-title {
+    margin: 0 0 0.35rem;
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+.page-subtitle {
+    margin: 0 0 2rem;
+}
+.text-muted-fm {
+    color: var(--fm-muted);
+}
+
+/* ===== Kartu, toolbar, tabel ===== */
+.card-fm {
+    padding: 2rem;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+.toolbar-fm {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+.toolbar-fm .search {
+    flex: 1 1 260px;
+    max-width: 302px;
+}
+.input-fm {
+    height: 38px;
+    padding: 0 0.85rem;
+    border: 1px solid var(--fm-border);
+    border-radius: 6px;
+    background-color: #fff;
+    color: #000;
+    font-size: 0.85rem;
+}
+.input-fm:focus {
+    outline: 0;
+    border-color: var(--fm-green);
+    box-shadow: 0 0 0 0.2rem rgba(64, 170, 85, 0.2);
+}
+.search-icon {
+    position: absolute;
+    top: 50%;
+    left: 0.85rem;
+    transform: translateY(-50%);
+    color: #6b6b6b;
+    pointer-events: none;
+}
+
+.table-fm-wrap {
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+.table-fm {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+.table-fm th {
+    padding: 0.9rem 1rem;
+    background: var(--fm-bg);
+    font-weight: 500;
+    text-align: left;
+}
+.table-fm td {
+    padding: 0.8rem 1rem;
+    border-top: 1px solid #e6e6e6;
+    vertical-align: middle;
+}
+
+.chip-kategori,
+.badge-stok {
+    display: inline-block;
+    min-width: 92px;
+    padding: 0.3rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-align: center;
+}
+.chip-kategori {
+    background: #ececec;
+    color: var(--fm-muted);
+}
+.badge-stok.aman {
+    background: #e5f0e0;
+    color: #40aa55;
+}
+.badge-stok.hampir_habis {
+    background: #fdf5d5;
+    color: #95661b;
+}
+.badge-stok.habis {
+    background: #feeeee;
+    color: #da2c2f;
+}
+
+.icon-btn {
+    padding: 0.35rem;
+    border: 0;
+    background: none;
+    color: #111b29;
+}
+.icon-btn.danger {
+    color: #da2c2f;
+}
+.icon-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.table-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    color: #4d4d4d;
+    font-size: 0.85rem;
+}
+.pager {
+    display: flex;
+    gap: 1.5rem;
+}
+.pager a {
+    color: #111b29;
+    text-decoration: none;
+}
+.pager a:hover {
+    color: var(--fm-green-dark);
+}
+.pager .disabled {
+    color: #838383;
+}
+
+@media (max-width: 991.98px) {
+    .app-shell {
+        flex-direction: column;
+    }
+    .app-sidebar {
+        position: static;
+        flex: none;
+        width: 100%;
+        height: auto;
+        border-radius: 0;
+    }
+    .app-main {
+        padding: 1.5rem 1rem;
+    }
+}

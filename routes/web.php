@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\BarangController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/login');
@@ -16,8 +17,11 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'role:pemilik,admin'])
-    ->get('/uji/admin', fn () => 'Halaman khusus Pemilik dan Admin')
-    ->name('uji.admin');
+    ->prefix('master')
+    ->name('master.')
+    ->group(function () {
+        Route::get('/barang', [BarangController::class, 'index'])->name('barang.index');
+    });
 
 Route::middleware(['auth', 'role:pemilik'])
     ->get('/uji/pemilik', fn () => 'Halaman khusus Pemilik')
