@@ -20,7 +20,8 @@ Route::middleware(['auth', 'role:pemilik,admin'])
     ->prefix('master')
     ->name('master.')
     ->group(function () {
-        Route::get('/barang', [BarangController::class, 'index'])->name('barang.index');
+        Route::resource('barang', BarangController::class)
+            ->only(['index', 'store', 'update', 'destroy']);
     });
 
 Route::middleware(['auth', 'role:pemilik'])

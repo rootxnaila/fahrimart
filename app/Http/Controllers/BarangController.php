@@ -2,11 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreBarangRequest;
+use App\Http\Requests\UpdateBarangRequest;
 use App\Models\Barang;
+use App\Services\BarangService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class BarangController extends Controller
 {
+    public function __construct(private BarangService $barangService)
+    {
+    }
+
     public function index(Request $request)
     {
         $batas = config('fahrimart.batas_stok_menipis');
@@ -33,6 +41,45 @@ class BarangController extends Controller
             ->orderBy('kategori')
             ->pluck('kategori');
 
-        return view('barang.index', compact('barang', 'kategori'));
+        $kategoriSaran = $kategori
+            ->merge(['Beras', 'Minyak', 'Snack', 'Makanan', 'Minuman', 'Lainnya'])
+            ->unique()
+            ->sort()
+            ->values();
+
+        return view('barang.index', compact('barang', 'kategori', 'kategoriSaran'));
+    }
+
+    public function store(StoreBarangRequest $request): RedirectResponse
+    {
+        $barang = $this->barangService->tambah($request->validated());
+
+        return redirect()
+            ->route('master.barang.index')
+            ->with('status', "Barang {$barang->nama_barang} berhasil ditambahkan.");
+    }
+
+    public function update(UpdateBarangRequest $request, Barang $barang): RedirectResponse
+    {
+        $barang = $this->barangService->ubah($barang, $request->validated());
+
+        return redirect()
+            ->back()
+            ->with('status', "Barang {$barang->nama_barang} berhasil diubah.");
+    }
+
+    public function destroy(Barang $barang): RedirectResponse
+    {
+        $nama = $barang->nama_barang;
+
+        if (! $this->barangService->hapus($barang)) {
+            return redirect()
+                ->back()
+                ->with('error', "Barang {$nama} tidak dapat dihapus karena sudah dipakai pada transaksi, pembelian stok, atau retur.");
+        }
+
+        return redirect()
+            ->back()
+            ->with('status', "Barang {$nama} berhasil dihapus.");
     }
 }

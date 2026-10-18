@@ -3,14 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreBarangRequest;
+use App\Http\Requests\UpdateBarangRequest;
 use App\Models\Barang;
-use Illuminate\Database\QueryException;
+use App\Services\BarangService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class BarangController extends Controller
 {
+    public function __construct(private BarangService $barangService)
+    {
+    }
+
     public function index(Request $request): JsonResponse
     {
         $perPage = min(max((int) $request->query('per_page', 10), 1), 100);
@@ -43,81 +48,38 @@ class BarangController extends Controller
         ]);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(StoreBarangRequest $request): JsonResponse
     {
-        $data = $request->validate($this->rules() + [
-            'stok' => ['required', 'integer', 'min:0'],
-        ]);
-
-        DB::statement('CALL add_barang(?, ?, ?, ?, ?, ?)', [
-            $data['nama_barang'],
-            $data['kategori'],
-            $data['satuan'],
-            $data['harga_beli'],
-            $data['harga_jual'],
-            $data['stok'],
-        ]);
-
-        $id = DB::selectOne('SELECT LAST_INSERT_ID() AS id')->id;
+        $barang = $this->barangService->tambah($request->validated());
 
         return response()->json([
             'success' => true,
             'message' => 'Barang berhasil ditambahkan',
-            'data' => Barang::findOrFail($id),
+            'data' => $barang,
         ], 201);
     }
 
-
-    public function update(Request $request, Barang $barang): JsonResponse
+    public function update(UpdateBarangRequest $request, Barang $barang): JsonResponse
     {
-        $data = $request->validate($this->rules());
-
-        DB::statement('CALL update_barang(?, ?, ?, ?, ?, ?)', [
-            $barang->id_barang,
-            $data['nama_barang'],
-            $data['kategori'],
-            $data['satuan'],
-            $data['harga_beli'],
-            $data['harga_jual'],
-        ]);
-
         return response()->json([
             'success' => true,
             'message' => 'Barang berhasil diubah',
-            'data' => $barang->fresh(),
+            'data' => $this->barangService->ubah($barang, $request->validated()),
         ]);
     }
 
     public function destroy(Barang $barang): JsonResponse
     {
-        try {
-            DB::statement('CALL delete_barang(?)', [$barang->id_barang]);
-        } catch (QueryException $e) {
-            // 23000 = pelanggaran foreign key (barang sudah dipakai di transaksi, pembelian, atau retur)
-            if ($e->getCode() === '23000') {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Barang tidak dapat dihapus karena sudah dipakai pada transaksi, pembelian stok, atau retur.',
-                ], 409);
-            }
-
-            throw $e;
+        if (! $this->barangService->hapus($barang)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Barang tidak dapat dihapus karena sudah dipakai pada transaksi, pembelian stok, atau retur.',
+            ], 409);
         }
 
         return response()->json([
             'success' => true,
             'message' => 'Barang berhasil dihapus',
         ]);
-    }
-
-    private function rules(): array
-    {
-        return [
-            'nama_barang' => ['required', 'string', 'max:100'],
-            'kategori' => ['required', 'string', 'max:50'],
-            'satuan' => ['required', 'string', 'max:20'],
-            'harga_beli' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
-            'harga_jual' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
-        ];
     }
 }
