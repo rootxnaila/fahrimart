@@ -31,8 +31,9 @@
                     <li>
                         <a href="{{ route('master.barang.index') }}" class="nav-fm-link {{ request()->routeIs('master.barang.*') ? 'active' : '' }}">Data Barang</a>
                     </li>
-                    <li><span class="nav-fm-link disabled" title="Segera">Data Supplier</span></li>
-                    <li><span class="nav-fm-link disabled" title="Segera">Data Pelanggan</span></li>
+                            <li>
+                                <a href="{{ route('master.supplier.index') }}" class="nav-fm-link {{ request()->routeIs('master.supplier.*') ? 'active' : '' }}">Data Supplier</a>
+                            </li>                    <li><span class="nav-fm-link disabled" title="Segera">Data Pelanggan</span></li>
                     @if ($role === 'pemilik')
                         <li><span class="nav-fm-link disabled" title="Segera">Kelola User</span></li>
                     @endif
