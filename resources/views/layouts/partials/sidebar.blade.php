@@ -6,6 +6,7 @@
     </a>
 
     <ul class="nav-fm">
+        {{-- Dashboard: semua peran --}}
         <li>
             <a href="{{ route('dashboard') }}" class="nav-fm-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <svg class="nav-fm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -17,6 +18,7 @@
         </li>
 
         @if (in_array($role, ['pemilik', 'admin']))
+            {{-- Master Data --}}
             <li>
                 <button type="button" class="nav-fm-link {{ request()->routeIs('master.*') ? 'active' : '' }}"
                         data-bs-toggle="collapse" data-bs-target="#menuMaster"
@@ -31,29 +33,36 @@
                     <li>
                         <a href="{{ route('master.barang.index') }}" class="nav-fm-link {{ request()->routeIs('master.barang.*') ? 'active' : '' }}">Data Barang</a>
                     </li>
-                            <li>
-                                <a href="{{ route('master.supplier.index') }}" class="nav-fm-link {{ request()->routeIs('master.supplier.*') ? 'active' : '' }}">Data Supplier</a>
-                            </li>                    <li><span class="nav-fm-link disabled" title="Segera">Data Pelanggan</span></li>
+                    <li>
+                        <a href="{{ route('master.supplier.index') }}" class="nav-fm-link {{ request()->routeIs('master.supplier.*') ? 'active' : '' }}">Data Supplier</a>
+                    </li>
+                    <li><span class="nav-fm-link disabled" title="Segera">Data Pelanggan</span></li>
                     @if ($role === 'pemilik')
                         <li><span class="nav-fm-link disabled" title="Segera">Kelola User</span></li>
                     @endif
                 </ul>
             </li>
 
+            {{-- Manajemen Stok --}}
             <li>
-                <button type="button" class="nav-fm-link" data-bs-toggle="collapse" data-bs-target="#menuStok" aria-expanded="false">
+                <button type="button" class="nav-fm-link {{ request()->routeIs('stok.*') ? 'active' : '' }}"
+                        data-bs-toggle="collapse" data-bs-target="#menuStok"
+                        aria-expanded="{{ request()->routeIs('stok.*') ? 'true' : 'false' }}">
                     <svg class="nav-fm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="M9 10h6M9 14h6M9 18h3"/>
                     </svg>
                     Manajemen Stok
                     <svg class="nav-fm-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
                 </button>
-                <ul id="menuStok" class="nav-fm-sub collapse">
-                    <li><span class="nav-fm-link disabled" title="Segera">Pembelian Stok</span></li>
+                <ul id="menuStok" class="nav-fm-sub collapse {{ request()->routeIs('stok.*') ? 'show' : '' }}">
+                    <li>
+                        <a href="{{ route('stok.pembelian.index') }}" class="nav-fm-link {{ request()->routeIs('stok.pembelian.*') ? 'active' : '' }}">Pembelian Stok</a>
+                    </li>
                     <li><span class="nav-fm-link disabled" title="Segera">Retur dan Barang Rusak</span></li>
                 </ul>
             </li>
 
+            {{-- Laporan --}}
             <li>
                 <span class="nav-fm-link disabled" title="Segera">
                     <svg class="nav-fm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">

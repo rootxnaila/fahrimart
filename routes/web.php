@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BarangController;
+use App\Http\Controllers\PembelianStokController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,7 +20,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', fn () => view('dashboard'))->name('dashboard');
 });
 
-// Master data: hanya Pemilik dan Admin
+// master data: hanya Pemilik dan Admin
 Route::middleware(['auth', 'role:pemilik,admin'])
     ->prefix('master')
     ->name('master.')
@@ -29,6 +30,15 @@ Route::middleware(['auth', 'role:pemilik,admin'])
 
         Route::resource('supplier', SupplierController::class)
             ->only(['index', 'store', 'update', 'destroy']);
+    });
+
+// manajemen stok: hanya Pemilik dan Admin
+Route::middleware(['auth', 'role:pemilik,admin'])
+    ->prefix('stok')
+    ->name('stok.')
+    ->group(function () {
+        Route::get('/pembelian', [PembelianStokController::class, 'index'])->name('pembelian.index');
+        Route::post('/pembelian', [PembelianStokController::class, 'store'])->name('pembelian.store');
     });
 
 Route::middleware(['auth', 'role:pemilik'])

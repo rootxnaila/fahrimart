@@ -458,3 +458,15 @@
     background: #e5f0e0;
     color: var(--fm-green-dark);
 }
+
+/* ===== Halaman pembelian stok ===== */
+.section-title {
+    margin: 0 0 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
+/* Panah dropdown tetap tampil saat select berstatus invalid */
+.form-select.input-fm.is-invalid {
+    background-image: var(--bs-form-select-bg-img);
+}
