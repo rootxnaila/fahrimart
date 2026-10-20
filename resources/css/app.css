@@ -470,3 +470,43 @@
 .form-select.input-fm.is-invalid {
     background-image: var(--bs-form-select-bg-img);
 }
+/* ===== Pilihan jenis (radio berbentuk chip) ===== */
+.jenis-chip {
+    position: relative;
+    margin: 0;
+    cursor: pointer;
+}
+.jenis-chip input {
+    position: absolute;
+    opacity: 0;
+}
+.jenis-chip span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+    background: #efefef;
+    color: #555;
+    font-size: 0.85rem;
+}
+.jenis-chip span::before {
+    content: "";
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid #888;
+    border-radius: 50%;
+    background: #fff;
+}
+.jenis-chip input:checked + span {
+    background: var(--fm-green-soft);
+    color: var(--fm-green-dark);
+}
+.jenis-chip input:checked + span::before {
+    border-color: var(--fm-green);
+    background: radial-gradient(circle, var(--fm-green) 45%, #fff 50%);
+}
+.jenis-chip input:focus-visible + span {
+    outline: 2px solid var(--fm-green);
+    outline-offset: 2px;
+}

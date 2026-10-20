@@ -58,8 +58,9 @@
                     <li>
                         <a href="{{ route('stok.pembelian.index') }}" class="nav-fm-link {{ request()->routeIs('stok.pembelian.*') ? 'active' : '' }}">Pembelian Stok</a>
                     </li>
-                    <li><span class="nav-fm-link disabled" title="Segera">Retur dan Barang Rusak</span></li>
-                </ul>
+<li>
+    <a href="{{ route('stok.retur.index') }}" class="nav-fm-link {{ request()->routeIs('stok.retur.*') ? 'active' : '' }}">Retur dan Barang Rusak</a>
+</li>                </ul>
             </li>
 
             {{-- Laporan --}}

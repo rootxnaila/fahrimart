@@ -3,12 +3,13 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\PembelianStokController;
+use App\Http\Controllers\ReturRusakController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/login');
 
-// hanya untuk yang belum login
+// Hanya untuk yang belum login
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:5,1');
@@ -39,6 +40,9 @@ Route::middleware(['auth', 'role:pemilik,admin'])
     ->group(function () {
         Route::get('/pembelian', [PembelianStokController::class, 'index'])->name('pembelian.index');
         Route::post('/pembelian', [PembelianStokController::class, 'store'])->name('pembelian.store');
+
+        Route::get('/retur', [ReturRusakController::class, 'index'])->name('retur.index');
+        Route::post('/retur', [ReturRusakController::class, 'store'])->name('retur.store');
     });
 
 Route::middleware(['auth', 'role:pemilik'])

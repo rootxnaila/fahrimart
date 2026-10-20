@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BarangController;
 use App\Http\Controllers\Api\PembelianStokController;
+use App\Http\Controllers\Api\ReturRusakController;
 use App\Http\Controllers\Api\SupplierController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('barang', BarangController::class);
         Route::apiResource('supplier', SupplierController::class);
         Route::apiResource('pembelian-stok', PembelianStokController::class)
+            ->only(['index', 'store', 'show']);
+        Route::apiResource('retur-rusak', ReturRusakController::class)
             ->only(['index', 'store', 'show']);
     });
 });
