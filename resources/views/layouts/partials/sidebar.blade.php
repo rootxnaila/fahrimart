@@ -64,13 +64,13 @@
             </li>
 
             {{-- Laporan --}}
-            <li>
-                <span class="nav-fm-link disabled" title="Segera">
+                        <li>
+                <a href="{{ route('laporan.index') }}" class="nav-fm-link {{ request()->routeIs('laporan.*') ? 'active' : '' }}">
                     <svg class="nav-fm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>
                     </svg>
                     Laporan
-                </span>
+                </a>
             </li>
         @endif
     </ul>

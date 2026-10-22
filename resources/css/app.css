@@ -510,3 +510,439 @@
     outline: 2px solid var(--fm-green);
     outline-offset: 2px;
 }
+/* ===== Halaman kasir (POS) ===== */
+.pos-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 1.5rem;
+    align-items: start;
+}
+.pos-judul {
+    margin: 0 0 1rem;
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+.pos-search {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 380px;
+    padding: 0.25rem 0.25rem 0.25rem 1rem;
+    border: 1px solid var(--fm-border);
+    border-radius: 999px;
+    background: #fff;
+}
+.pos-search input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font-size: 0.9rem;
+}
+.pos-search .btn {
+    padding: 0.35rem 1.25rem;
+    border-radius: 999px;
+}
+
+.chip-kat {
+    padding: 0.35rem 1.1rem;
+    border: 0;
+    border-radius: 999px;
+    background: var(--fm-chip);
+    color: var(--fm-muted);
+    font-size: 0.85rem;
+}
+.chip-kat.active {
+    background: var(--fm-orange);
+    color: #fff;
+}
+
+.pos-populer {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border-radius: 24px;
+    background: var(--fm-green-panel);
+}
+.pos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.produk-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    height: 100%;
+    padding: 0.85rem;
+    border: 1px solid #ececec;
+    border-radius: 12px;
+    background: #fff;
+}
+.produk-card.habis {
+    opacity: 0.55;
+}
+.produk-card.habis::after {
+    content: "Habis";
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    padding: 0.1rem 0.6rem;
+    border-radius: 999px;
+    background: #feeeee;
+    color: #da2c2f;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+.produk-gambar,
+.cart-thumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: #f1f1f1;
+    color: #b5b5b5;
+}
+.produk-gambar {
+    height: 110px;
+    margin-bottom: 0.5rem;
+}
+.produk-nama {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+.produk-desk,
+.produk-stok {
+    color: var(--fm-muted);
+    font-size: 0.72rem;
+}
+.produk-harga {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+.produk-aksi {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 0.5rem;
+}
+
+.btn-add,
+.btn-bag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--fm-green);
+    color: #fff;
+    font-size: 1.1rem;
+    line-height: 1;
+}
+.btn-add:hover,
+.btn-bag:hover {
+    background: #369a4b;
+}
+.btn-add:disabled,
+.btn-bag:disabled {
+    background: #bdbdbd;
+    cursor: not-allowed;
+}
+
+.stepper {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+}
+.stepper button {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid #d5d5d5;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--fm-green-dark);
+    line-height: 1;
+}
+.stepper button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Panel keranjang */
+.pos-cart {
+    position: sticky;
+    top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 3rem);
+    padding: 1.5rem;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+.cart-list {
+    flex: 1;
+    min-height: 120px;
+    margin: 1rem -0.25rem;
+    padding: 0 0.25rem;
+    overflow-y: auto;
+}
+.cart-kosong {
+    padding: 2rem 0;
+    color: var(--fm-muted);
+    font-size: 0.85rem;
+    text-align: center;
+}
+.cart-row {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid #ededed;
+}
+.cart-thumb {
+    flex: 0 0 56px;
+    height: 56px;
+}
+.cart-info {
+    flex: 1;
+    min-width: 0;
+}
+.cart-nama {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+.cart-desk {
+    color: var(--fm-muted);
+    font-size: 0.72rem;
+}
+.cart-harga {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+.cart-hapus {
+    align-self: flex-start;
+    padding: 0 0.25rem;
+    border: 0;
+    background: none;
+    color: #9a9a9a;
+    font-size: 1.2rem;
+    line-height: 1;
+}
+.cart-hapus:hover {
+    color: #da2c2f;
+}
+.cart-ringkas {
+    padding-top: 1rem;
+    border-top: 1px solid #ededed;
+    font-size: 0.9rem;
+}
+.cart-ringkas > div {
+    margin-bottom: 0.35rem;
+}
+
+.btn-fm-dark {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--fm-green-dark);
+    --bs-btn-border-color: var(--fm-green-dark);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #14602a;
+    --bs-btn-hover-border-color: #14602a;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #11521f;
+    --bs-btn-active-border-color: #11521f;
+    --bs-btn-disabled-bg: #9bbfa5;
+    --bs-btn-disabled-border-color: #9bbfa5;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 0.6rem 1rem;
+}
+
+/* Modal pembayaran dan struk */
+.metode-btn {
+    flex: 1;
+    padding: 0.7rem;
+    border: 1px solid var(--fm-border);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--fm-muted);
+    font-size: 0.9rem;
+}
+.metode-btn.active {
+    border-color: var(--fm-green);
+    background: var(--fm-green-soft);
+    color: var(--fm-green-dark);
+    font-weight: 600;
+}
+.struk-check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--fm-green);
+    color: #fff;
+}
+.struk-box {
+    padding: 0.85rem 1rem;
+    border: 1px solid #ececec;
+    border-radius: 12px;
+    font-size: 0.8rem;
+}
+.struk-box table {
+    width: 100%;
+}
+.struk-box th {
+    padding-bottom: 0.4rem;
+    font-weight: 500;
+}
+.struk-box td {
+    padding: 0.2rem 0;
+    color: var(--fm-muted);
+}
+.struk-box .r {
+    text-align: right;
+}
+.struk-baris {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.15rem 0;
+}
+
+@media (max-width: 1199.98px) {
+    .pos-layout {
+        grid-template-columns: 1fr;
+    }
+    .pos-cart {
+        position: static;
+        max-height: none;
+    }
+}
+
+/* Cetak: hanya struk yang tampil */
+@media print {
+    body * {
+        visibility: hidden !important;
+    }
+    #modalStruk .struk-print,
+    #modalStruk .struk-print * {
+        visibility: visible !important;
+    }
+    #modalStruk {
+        position: absolute;
+        inset: 0;
+        overflow: visible;
+    }
+    #modalStruk .modal-dialog {
+        max-width: 380px;
+        margin: 0 auto;
+    }
+    #modalStruk .modal-content {
+        border: 0;
+        box-shadow: none;
+    }
+    .modal-backdrop,
+    .no-print {
+        display: none !important;
+    }
+}
+/* ===== Laporan penjualan dan analisis AI ===== */
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    height: 100%;
+    padding: 1.5rem;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+.stat-icon {
+    display: flex;
+    flex: 0 0 56px;
+    align-items: center;
+    justify-content: center;
+    height: 56px;
+    border-radius: 16px;
+    background: var(--fm-green-panel);
+    color: var(--fm-green-dark);
+}
+.stat-label {
+    color: var(--fm-muted);
+    font-size: 0.85rem;
+}
+.stat-value {
+    font-size: 1.6rem;
+    font-weight: 600;
+}
+.chart-box {
+    position: relative;
+    height: 300px;
+}
+
+.badge-stok.kritis {
+    background: #feeeee;
+    color: #da2c2f;
+}
+.badge-stok.waspada {
+    background: #fdf5d5;
+    color: #95661b;
+}
+.badge-stok.tanpa_data {
+    background: #ececec;
+    color: #6b6b6b;
+}
+
+.badge-prio {
+    display: inline-block;
+    min-width: 64px;
+    padding: 0.15rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+}
+.badge-prio.Tinggi {
+    background: #feeeee;
+    color: #da2c2f;
+}
+.badge-prio.Sedang {
+    background: #fdf5d5;
+    color: #95661b;
+}
+.badge-prio.Rendah {
+    background: #e5f0e0;
+    color: #2f8a43;
+}
+
+.insight-ringkasan {
+    padding: 1rem 1.25rem;
+    border-left: 4px solid var(--fm-green);
+    border-radius: 8px;
+    background: var(--fm-green-soft);
+    line-height: 1.7;
+}
+.step-item {
+    display: flex;
+    gap: 0.85rem;
+    padding: 0.85rem 0;
+    border-top: 1px solid #ececec;
+}
+.label-sumber {
+    display: inline-block;
+    padding: 0.15rem 0.7rem;
+    border-radius: 999px;
+    background: #ececec;
+    color: var(--fm-muted);
+    font-size: 0.75rem;
+}
