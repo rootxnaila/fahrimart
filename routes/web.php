@@ -53,11 +53,13 @@ Route::middleware(['auth', 'role:pemilik,admin'])
     });
 
 // laporan penjualan + analisis AI: hanya Pemilik dan Admin
+// Laporan penjualan + analisis AI: hanya Pemilik dan Admin
 Route::middleware(['auth', 'role:pemilik,admin'])
     ->prefix('laporan')
     ->name('laporan.')
     ->group(function () {
         Route::get('/', [LaporanController::class, 'index'])->name('index');
+        Route::get('/pdf', [LaporanController::class, 'pdf'])->name('pdf');
         Route::post('/analisis', [LaporanController::class, 'perbarui'])->name('analisis.perbarui');
     });
 Route::middleware(['auth', 'role:pemilik'])

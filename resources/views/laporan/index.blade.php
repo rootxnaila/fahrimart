@@ -3,18 +3,23 @@
 @section('title', 'Laporan Penjualan')
 
 @section('content')
-    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
         <div>
             <h1 class="page-title">Laporan Penjualan</h1>
             <p class="page-subtitle mb-0">Pantau performa penjualan toko Anda</p>
         </div>
 
-        <form method="GET" action="{{ route('laporan.index') }}" class="d-flex flex-wrap align-items-center gap-2">
-            <input type="date" name="dari" value="{{ $dari->toDateString() }}" max="{{ today()->toDateString() }}" class="input-fm">
-            <span>-</span>
-            <input type="date" name="sampai" value="{{ $sampai->toDateString() }}" max="{{ today()->toDateString() }}" class="input-fm">
-            <button type="submit" class="btn btn-fm btn-sm px-4">Terapkan</button>
-        </form>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <form method="GET" action="{{ route('laporan.index') }}" class="d-flex flex-wrap align-items-center gap-2">
+                <input type="date" name="dari" value="{{ $dari->toDateString() }}" max="{{ today()->toDateString() }}" class="input-fm">
+                <span>-</span>
+                <input type="date" name="sampai" value="{{ $sampai->toDateString() }}" max="{{ today()->toDateString() }}" class="input-fm">
+                <button type="submit" class="btn btn-fm-outline btn-sm px-4">Terapkan</button>
+            </form>
+
+            <a href="{{ route('laporan.pdf', ['dari' => $dari->toDateString(), 'sampai' => $sampai->toDateString()]) }}"
+               class="btn btn-fm btn-sm px-4">Export PDF</a>
+        </div>
     </div>
 
     @if (session('status'))
