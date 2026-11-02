@@ -7,6 +7,7 @@ use App\Http\Controllers\PembelianStokController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\ReturRusakController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\TransaksiController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/login');
@@ -51,6 +52,11 @@ Route::middleware(['auth', 'role:pemilik,admin'])
         Route::get('/retur', [ReturRusakController::class, 'index'])->name('retur.index');
         Route::post('/retur', [ReturRusakController::class, 'store'])->name('retur.store');
     });
+
+    //transaksi
+Route::middleware(['auth'])->group(function () {
+    Route::get('/transaksi/riwayat', [TransaksiController::class, 'index'])->name('transaksi.riwayat');
+});
 
 // laporan penjualan + analisis AI: hanya Pemilik dan Admin
 // Laporan penjualan + analisis AI: hanya Pemilik dan Admin

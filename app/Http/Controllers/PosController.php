@@ -19,7 +19,7 @@ class PosController extends Controller
         $produk = Barang::query()
             ->orderBy('nama_barang')
             ->orderBy('id_barang')
-            ->get(['id_barang', 'nama_barang', 'kategori', 'satuan', 'harga_jual', 'stok']);
+            ->get(['id_barang', 'nama_barang', 'kategori', 'satuan', 'harga_jual', 'stok', 'foto']); 
 
         $kategori = $produk->pluck('kategori')->unique()->sort()->values();
 
@@ -48,6 +48,7 @@ class PosController extends Controller
                 'satuan' => $p->satuan,
                 'harga' => (float) $p->harga_jual,
                 'stok' => (int) $p->stok,
+                'foto_url' => $p->foto_url, // Tambahkan ini untuk dipakai di frontend
             ],
         ]);
 

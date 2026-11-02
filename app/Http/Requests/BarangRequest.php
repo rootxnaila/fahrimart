@@ -6,7 +6,6 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class BarangRequest extends FormRequest
 {
-
     public function authorize(): bool
     {
         return true;
@@ -20,6 +19,7 @@ class BarangRequest extends FormRequest
             'satuan' => ['required', 'string', 'max:20'],
             'harga_beli' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
             'harga_jual' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
+            'foto' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'], 
         ];
     }
 
@@ -32,6 +32,9 @@ class BarangRequest extends FormRequest
             'integer' => ':attribute harus berupa bilangan bulat.',
             'min' => ':attribute tidak boleh kurang dari :min.',
             'max' => ':attribute melebihi batas (maksimal :max).',
+            'image' => ':attribute harus berupa file gambar.',
+            'mimes' => 'Format :attribute yang diizinkan hanya: jpeg, png, jpg, atau webp.',
+            'foto.max' => 'Ukuran :attribute maksimal adalah 2MB (2048 KB).',
         ];
     }
 
@@ -44,6 +47,7 @@ class BarangRequest extends FormRequest
             'harga_beli' => 'Harga beli',
             'harga_jual' => 'Harga jual',
             'stok' => 'Stok awal',
+            'foto' => 'Foto produk', 
         ];
     }
 }

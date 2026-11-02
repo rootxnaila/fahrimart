@@ -17,6 +17,16 @@
             </a>
         </li>
 
+        {{-- Riwayat Transaksi: bisa diakses semua peran (Pemilik, Admin, Kasir) --}}
+        <li>
+            <a href="{{ route('transaksi.riwayat') }}" class="nav-fm-link {{ request()->routeIs('transaksi.riwayat') ? 'active' : '' }}">
+                <svg class="nav-fm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                Riwayat Transaksi
+            </a>
+        </li>
+
         @if (in_array($role, ['pemilik', 'admin']))
             {{-- Master Data --}}
             <li>
@@ -58,13 +68,14 @@
                     <li>
                         <a href="{{ route('stok.pembelian.index') }}" class="nav-fm-link {{ request()->routeIs('stok.pembelian.*') ? 'active' : '' }}">Pembelian Stok</a>
                     </li>
-<li>
-    <a href="{{ route('stok.retur.index') }}" class="nav-fm-link {{ request()->routeIs('stok.retur.*') ? 'active' : '' }}">Retur dan Barang Rusak</a>
-</li>                </ul>
+                    <li>
+                        <a href="{{ route('stok.retur.index') }}" class="nav-fm-link {{ request()->routeIs('stok.retur.*') ? 'active' : '' }}">Retur dan Barang Rusak</a>
+                    </li>
+                </ul>
             </li>
 
             {{-- Laporan --}}
-                        <li>
+            <li>
                 <a href="{{ route('laporan.index') }}" class="nav-fm-link {{ request()->routeIs('laporan.*') ? 'active' : '' }}">
                     <svg class="nav-fm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>

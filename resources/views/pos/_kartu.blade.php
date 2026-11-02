@@ -2,9 +2,15 @@
 
 <div class="produk-card {{ $habis ? 'habis' : '' }}" data-id="{{ $p->id_barang }}">
     <div class="produk-gambar">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 7h12l1 13H5z"/><path d="M9 7a3 3 0 0 1 6 0"/>
-        </svg>
+        @if ($p->foto_url)
+            <!-- Tampilkan foto jika ada -->
+            <img src="{{ $p->foto_url }}" alt="{{ $p->nama_barang }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+        @else
+            <!-- Placeholder bawaan jika tidak ada foto -->
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 7h12l1 13H5z"/><path d="M9 7a3 3 0 0 1 6 0"/>
+            </svg>
+        @endif
     </div>
     <div class="produk-nama">{{ $p->nama_barang }}</div>
     <div class="produk-desk">{{ $p->kategori }} &middot; {{ $p->satuan }}</div>

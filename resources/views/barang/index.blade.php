@@ -66,7 +66,12 @@
                     @forelse ($barang as $b)
                         <tr>
                             <td>{{ $b->kode_barang }}</td>
-                            <td class="text-muted-fm">{{ $b->nama_barang }}</td>
+                            <td class="text-muted-fm">
+                                @if($b->foto_url)
+                                    <img src="{{ $b->foto_url }}" alt="foto" class="rounded me-2" style="width: 30px; height: 30px; object-fit: cover;">
+                                @endif
+                                {{ $b->nama_barang }}
+                            </td>
                             <td><span class="chip-kategori">{{ $b->kategori }}</span></td>
                             <td class="text-muted-fm">{{ number_format($b->harga_beli, 0, ',', '.') }}</td>
                             <td class="text-muted-fm">{{ number_format($b->harga_jual, 0, ',', '.') }}</td>
@@ -81,7 +86,8 @@
                                         data-satuan="{{ $b->satuan }}"
                                         data-harga-beli="{{ $b->harga_beli }}"
                                         data-harga-jual="{{ $b->harga_jual }}"
-                                        data-stok="{{ $b->stok }}">
+                                        data-stok="{{ $b->stok }}"
+                                        data-foto="{{ $b->foto_url }}">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
                                 </button>
                                 <button type="button" class="icon-btn danger" title="Hapus" aria-label="Hapus"
@@ -141,7 +147,7 @@
     {{-- Modal Tambah Barang --}}
     <div class="modal fade" id="modalTambah" tabindex="-1" aria-labelledby="judulTambah" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <form method="POST" action="{{ route('master.barang.store', [], false) }}" class="modal-content modal-fm" novalidate>
+            <form method="POST" action="{{ route('master.barang.store', [], false) }}" class="modal-content modal-fm" enctype="multipart/form-data" novalidate>
                 @csrf
                 <input type="hidden" name="_modal" value="tambah">
 
@@ -163,7 +169,7 @@
     {{-- Modal Ubah Barang --}}
     <div class="modal fade" id="modalUbah" tabindex="-1" aria-labelledby="judulUbah" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <form method="POST" id="formUbah" action="" class="modal-content modal-fm" novalidate>
+            <form method="POST" id="formUbah" action="" class="modal-content modal-fm" enctype="multipart/form-data" novalidate>
                 @csrf
                 @method('PUT')
                 <input type="hidden" name="_modal" value="ubah">
@@ -214,11 +220,10 @@
     document.addEventListener('DOMContentLoaded', () => {
         const urlBase = @json(route('master.barang.index', [], false));
 
-        // Isi modal Ubah dari data baris yang diklik
         const modalUbah = document.getElementById('modalUbah');
         modalUbah.addEventListener('show.bs.modal', (e) => {
             const btn = e.relatedTarget;
-            if (!btn) return; // dibuka otomatis setelah error validasi: pakai isian dari server
+            if (!btn) return; 
 
             const form = document.getElementById('formUbah');
             form.action = urlBase + '/' + btn.dataset.id;
@@ -230,9 +235,19 @@
             form.querySelector('[name=harga_beli]').value = btn.dataset.hargaBeli;
             form.querySelector('[name=harga_jual]').value = btn.dataset.hargaJual;
             document.getElementById('ubah-stok-info').textContent = btn.dataset.stok;
+
+            const fotoPreviewContainer = document.getElementById('ubah-foto-preview-container');
+            const fotoPreview = document.getElementById('ubah-foto-preview');
+            
+            if (btn.dataset.foto) {
+                fotoPreview.src = btn.dataset.foto;
+                fotoPreviewContainer.classList.remove('d-none');
+            } else {
+                fotoPreview.src = '';
+                fotoPreviewContainer.classList.add('d-none');
+            }
         });
 
-        // Isi modal Hapus
         const modalHapus = document.getElementById('modalHapus');
         modalHapus.addEventListener('show.bs.modal', (e) => {
             const btn = e.relatedTarget;
@@ -242,7 +257,6 @@
             document.getElementById('hapus-nama').textContent = btn.dataset.nama;
         });
 
-        // Buka lagi modal yang gagal validasi
         @if ($errors->any() && old('_modal'))
             @if (old('_modal') === 'ubah')
                 document.getElementById('formUbah').action = urlBase + '/' + @json(old('_id'));

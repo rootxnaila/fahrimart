@@ -52,6 +52,7 @@ class LaporanController extends Controller
             'ramalan' => $analisis['penjualan']['ramalan'],
             'perhatian' => collect($analisis['stok'])->whereIn('status', ['habis', 'kritis', 'waspada'])->values(),
             'insight' => $analisis['insight'],
+            'kpi' => $this->ringkasanKpi($analisis),
             'dibuatPada' => Carbon::parse($analisis['dibuat_pada']),
             'riwayat' => $riwayat,
         ]);
@@ -137,7 +138,30 @@ class LaporanController extends Controller
         return back()->with('status', 'Analisis diperbarui.');
     }
 
+    private function ringkasanKpi(array $analisis): array
+    {
+        $omzet = $analisis['penjualan']['riwayat']['omzet'];
+        $ramalan = $analisis['penjualan']['ramalan'];
 
+        $omzet7 = array_sum(array_slice($omzet, -7));
+        $sebelum7 = count($omzet) >= 14 ? array_sum(array_slice($omzet, -14, 7)) : 0;
+        $tren = $sebelum7 > 0 ? round(($omzet7 - $sebelum7) / $sebelum7 * 100, 1) : null;
+
+        $ramalan7 = $ramalan ? array_sum(array_slice($ramalan['ramalan'], 0, 7)) : null;
+        $perubahan = ($ramalan7 !== null && $omzet7 > 0) ? round(($ramalan7 - $omzet7) / $omzet7 * 100, 1) : null;
+
+        $hitung = array_count_values(array_column($analisis['stok'], 'status'));
+
+        return [
+            'omzet_7_hari' => $omzet7,
+            'tren_persen' => $tren,
+            'ramalan_7_hari' => $ramalan7,
+            'ramalan_perubahan_persen' => $perubahan,
+            'habis' => $hitung['habis'] ?? 0,
+            'kritis' => $hitung['kritis'] ?? 0,
+            'waspada' => $hitung['waspada'] ?? 0,
+        ];
+    }
     private function rentang(Request $request): array
     {
         $input = $request->validate([

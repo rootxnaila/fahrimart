@@ -15,5 +15,9 @@ class Transaksi extends Model
 
     protected $keyType = 'string';
 
-    public $timestamps = false;
+    public $timestamps = false; 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_user', 'id_user');
+    }
 }

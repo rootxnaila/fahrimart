@@ -7,10 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 class Barang extends Model
 {
     protected $table = 'barang';
-
     protected $primaryKey = 'id_barang';
-
     public $timestamps = false;
+
+    protected $fillable = [
+        'nama_barang',
+        'kategori',
+        'satuan',
+        'harga_beli',
+        'harga_jual',
+        'stok',
+        'foto',
+    ];
 
     protected $casts = [
         'harga_beli' => 'float',
@@ -18,6 +26,12 @@ class Barang extends Model
         'stok' => 'integer',
     ];
 
+    protected $appends = ['foto_url', 'kode_barang', 'status_stok', 'label_status'];
+
+    public function getFotoUrlAttribute(): ?string
+    {
+        return $this->foto ? asset('storage/' . $this->foto) : null;
+    }
 
     public function getKodeBarangAttribute(): string
     {

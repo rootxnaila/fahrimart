@@ -215,9 +215,15 @@
             } else {
                 box.innerHTML = [...cart].map(([id, qty]) => {
                     const p = PRODUK[id];
+                    
+                    // Cek ketersediaan foto untuk keranjang
+                    const thumbHtml = p.foto_url 
+                        ? `<img src="${p.foto_url}" alt="foto" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">` 
+                        : IKON;
+
                     return `
                         <div class="cart-row" data-id="${id}">
-                            <div class="cart-thumb">${IKON}</div>
+                            <div class="cart-thumb">${thumbHtml}</div>
                             <div class="cart-info">
                                 <div class="cart-nama">${esc(p.nama)}</div>
                                 <div class="cart-desk">${esc(p.satuan)}</div>

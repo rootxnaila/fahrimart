@@ -8,6 +8,7 @@ use App\Models\Barang;
 use App\Services\BarangService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage; 
 
 class BarangController extends Controller
 {
@@ -52,7 +53,13 @@ class BarangController extends Controller
 
     public function store(StoreBarangRequest $request): RedirectResponse
     {
-        $barang = $this->barangService->tambah($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('foto')) {
+            $data['foto'] = $request->file('foto')->store('produk', 'public');
+        }
+
+        $barang = $this->barangService->tambah($data);
 
         return redirect()
             ->route('master.barang.index')
@@ -61,7 +68,16 @@ class BarangController extends Controller
 
     public function update(UpdateBarangRequest $request, Barang $barang): RedirectResponse
     {
-        $barang = $this->barangService->ubah($barang, $request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('foto')) {
+            if ($barang->foto) {
+                Storage::disk('public')->delete($barang->foto);
+            }
+            $data['foto'] = $request->file('foto')->store('produk', 'public');
+        }
+
+        $barang = $this->barangService->ubah($barang, $data);
 
         return redirect()
             ->back()
@@ -71,11 +87,16 @@ class BarangController extends Controller
     public function destroy(Barang $barang): RedirectResponse
     {
         $nama = $barang->nama_barang;
+        $fotoLama = $barang->foto;
 
         if (! $this->barangService->hapus($barang)) {
             return redirect()
                 ->back()
                 ->with('error', "Barang {$nama} tidak dapat dihapus karena sudah dipakai pada transaksi, pembelian stok, atau retur.");
+        }
+
+        if ($fotoLama) {
+            Storage::disk('public')->delete($fotoLama);
         }
 
         return redirect()

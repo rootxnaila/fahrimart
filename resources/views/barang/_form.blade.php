@@ -17,9 +17,13 @@
 
 <div class="mb-3">
     <label for="{{ $mode }}-kategori" class="form-label">Kategori</label>
-    <input type="text" id="{{ $mode }}-kategori" name="kategori" value="{{ $val('kategori') }}" list="daftarKategori"
-           class="form-control input-fm input-fm-lg {{ $err('kategori') ? 'is-invalid' : '' }}"
-           placeholder="Pilih atau ketik kategori" maxlength="50" autocomplete="off">
+    <select id="{{ $mode }}-kategori" name="kategori"
+            class="form-control input-fm input-fm-lg {{ $err('kategori') ? 'is-invalid' : '' }}">
+        <option value="">Pilih Kategori</option>
+        <option value="Sembako" @selected($val('kategori') === 'Sembako')>Sembako</option>
+        <option value="Snacks" @selected($val('kategori') === 'Snacks')>Snacks</option>
+        <option value="Minuman" @selected($val('kategori') === 'Minuman')>Minuman</option>
+    </select>
     @if ($err('kategori'))
         <div class="invalid-feedback">{{ $err('kategori') }}</div>
     @endif
@@ -30,7 +34,8 @@
         <label for="{{ $mode }}-beli" class="form-label">Harga Beli</label>
         <div class="position-relative">
             <span class="rp-prefix">Rp</span>
-            <input type="number" id="{{ $mode }}-beli" name="harga_beli" value="{{ $val('harga_beli') }}" min="0" step="any"
+            <!-- step diubah menjadi 1000 -->
+            <input type="number" id="{{ $mode }}-beli" name="harga_beli" value="{{ $val('harga_beli') }}" min="0" step="1000"
                    class="form-control input-fm input-fm-lg has-prefix {{ $err('harga_beli') ? 'is-invalid' : '' }}" placeholder="0">
             @if ($err('harga_beli'))
                 <div class="invalid-feedback">{{ $err('harga_beli') }}</div>
@@ -41,7 +46,7 @@
         <label for="{{ $mode }}-jual" class="form-label">Harga Jual</label>
         <div class="position-relative">
             <span class="rp-prefix">Rp</span>
-            <input type="number" id="{{ $mode }}-jual" name="harga_jual" value="{{ $val('harga_jual') }}" min="0" step="any"
+            <input type="number" id="{{ $mode }}-jual" name="harga_jual" value="{{ $val('harga_jual') }}" min="0" step="1000"
                    class="form-control input-fm input-fm-lg has-prefix {{ $err('harga_jual') ? 'is-invalid' : '' }}" placeholder="0">
             @if ($err('harga_jual'))
                 <div class="invalid-feedback">{{ $err('harga_jual') }}</div>
@@ -53,9 +58,14 @@
 <div class="row g-3 mb-2">
     <div class="col-6">
         <label for="{{ $mode }}-satuan" class="form-label">Satuan</label>
-        <input type="text" id="{{ $mode }}-satuan" name="satuan" value="{{ $val('satuan') }}" list="daftarSatuan"
-               class="form-control input-fm input-fm-lg {{ $err('satuan') ? 'is-invalid' : '' }}"
-               placeholder="Pcs, Kg, Karung..." maxlength="20" autocomplete="off">
+        <!-- Diubah menjadi dropdown select -->
+        <select id="{{ $mode }}-satuan" name="satuan"
+                class="form-control input-fm input-fm-lg {{ $err('satuan') ? 'is-invalid' : '' }}">
+            <option value="">Pilih Satuan</option>
+            @foreach (['Pcs', 'Kg', 'Karung', 'Liter', 'Botol', 'Dus', 'Pak'] as $s)
+                <option value="{{ $s }}" @selected($val('satuan') === $s)>{{ $s }}</option>
+            @endforeach
+        </select>
         @if ($err('satuan'))
             <div class="invalid-feedback">{{ $err('satuan') }}</div>
         @endif
@@ -76,6 +86,22 @@
     </div>
 </div>
 
+<div class="mb-3 mt-2">
+    <label for="{{ $mode }}-foto" class="form-label">Foto Produk (Opsional)</label>
+    <input type="file" id="{{ $mode }}-foto" name="foto" accept="image/jpeg,image/png,image/webp,image/jpg"
+           class="form-control {{ $err('foto') ? 'is-invalid' : '' }}">
+    @if ($err('foto'))
+        <div class="invalid-feedback">{{ $err('foto') }}</div>
+    @endif
+    
+    @unless ($withStok)
+        <div id="{{ $mode }}-foto-preview-container" class="mt-2 d-none">
+            <p class="small text-muted-fm mb-1">Foto saat ini:</p>
+            <img id="{{ $mode }}-foto-preview" src="" alt="Preview Foto" class="img-thumbnail" style="max-height: 100px;">
+        </div>
+    @endunless
+</div>
+
 @unless ($withStok)
-    <p class="small text-muted-fm mb-0">Stok tidak diubah di sini. Stok berubah lewat penjualan, pembelian stok, atau retur.</p>
+    <p class="small text-muted-fm mb-0 mt-3">Stok tidak diubah di sini. Stok berubah lewat penjualan, pembelian stok, atau retur.</p>
 @endunless

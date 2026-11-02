@@ -3,7 +3,7 @@
 @section('title', 'Laporan Penjualan')
 
 @section('content')
-        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
         <div>
             <h1 class="page-title">Laporan Penjualan</h1>
             <p class="page-subtitle mb-0">Pantau performa penjualan toko Anda</p>
@@ -33,7 +33,7 @@
         <div class="alert alert-danger">{{ $errors->first() }}</div>
     @endif
 
-    {{-- Ringkasan --}}
+    {{-- ringkasan --}}
     <div class="row g-3 mb-4">
         <div class="col-md-6">
             <div class="stat-card">
@@ -59,18 +59,49 @@
         </div>
     </div>
 
-    {{-- Tren penjualan --}}
+    {{-- tren penjualan --}}
     <div class="card-fm mb-4">
         <h2 class="section-title">Tren Penjualan</h2>
         <div class="chart-box"><canvas id="chartTren"></canvas></div>
     </div>
 
     {{-- ===================== ANALISIS AI ===================== --}}
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-        <div>
-            <h2 class="h4 mb-0">Analisis AI</h2>
-            <div class="small text-muted-fm">
-                Dihitung {{ $dibuatPada->format('d/m/Y H:i') }}, berdasarkan data penjualan sampai kemarin.
+    @php
+        $rpRingkas = function ($v) {
+            if ($v >= 1000000000) {
+                return 'Rp ' . number_format($v / 1000000000, 1, ',', '.') . ' M';
+            }
+            if ($v >= 1000000) {
+                return 'Rp ' . number_format($v / 1000000, 1, ',', '.') . ' jt';
+            }
+            if ($v >= 1000) {
+                return 'Rp ' . number_format($v / 1000, 0, ',', '.') . ' rb';
+            }
+
+            return 'Rp ' . number_format($v, 0, ',', '.');
+        };
+        $panah = fn ($p) => ($p >= 0 ? '&#9650; ' : '&#9660; ') . number_format(abs($p), 1, ',', '.') . '%';
+        $kelas = fn ($p) => $p === null ? '' : ($p >= 0 ? 'naik' : 'turun');
+
+        $perhatianTotal = $kpi['habis'] + $kpi['kritis'] + $kpi['waspada'];
+        $akurasi = ($ramalan && $ramalan['wape'] !== null) ? max(0, round(100 - $ramalan['wape'] * 100)) : null;
+        $langkahUtama = array_slice($insight['next_steps'], 0, 3);
+        $langkahLain = array_slice($insight['next_steps'], 3);
+        $stokUtama = $perhatian->take(5);
+        $stokLain = $perhatian->slice(5);
+        $ac = config('fahrimart.analisis');
+    @endphp
+
+    <div class="ai-header">
+        <div class="d-flex align-items-center gap-3">
+            <span class="ai-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 16l.8 2 2 .8-2 .8L19 22l-.8-2.4-2-.8 2-.8z"/></svg>
+            </span>
+            <div>
+                <h2 class="h4 mb-0">Analisis AI</h2>
+                <div class="small text-muted-fm">
+                    Diperbarui {{ $dibuatPada->format('d/m/Y H:i') }} &middot; berdasarkan penjualan sampai kemarin
+                </div>
             </div>
         </div>
         <form method="POST" action="{{ route('laporan.analisis.perbarui') }}">
@@ -79,105 +110,164 @@
         </form>
     </div>
 
-    {{-- Prakiraan --}}
-    <div class="card-fm mb-4">
-        <h2 class="section-title">AI Forecasting: Prakiraan Omzet {{ $ramalan ? count($ramalan['tanggal']) : '' }} Hari ke Depan</h2>
-
-        @if ($ramalan)
-            <div class="chart-box mb-3"><canvas id="chartRamalan"></canvas></div>
-            <div class="small text-muted-fm">
-                Model terpilih: <strong>{{ $ramalan['model'] }}</strong>
-                @if ($ramalan['wape'] !== null)
-                    &middot; galat uji (WAPE) {{ number_format($ramalan['wape'] * 100, 1, ',', '.') }}%
+    {{-- angka kunci --}}
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-xl-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Prakiraan omzet 7 hari ke depan</div>
+                <div class="kpi-nilai">{{ $kpi['ramalan_7_hari'] !== null ? $rpRingkas($kpi['ramalan_7_hari']) : '-' }}</div>
+                @if ($kpi['ramalan_perubahan_persen'] !== null)
+                    <div class="kpi-sub {{ $kelas($kpi['ramalan_perubahan_persen']) }}">{!! $panah($kpi['ramalan_perubahan_persen']) !!} dari 7 hari terakhir</div>
+                @else
+                    <div class="kpi-sub">Data belum cukup</div>
                 @endif
-                &middot; prakiraan 7 hari ke depan: Rp {{ number_format(array_sum(array_slice($ramalan['ramalan'], 0, 7)), 0, ',', '.') }}.
-                Area hijau muda adalah rentang kepercayaan sekitar 80%. Omzet termasuk PPN.
             </div>
-        @else
-            <p class="mb-0 text-muted-fm">Data penjualan belum cukup untuk membuat prakiraan (minimal 7 hari bertransaksi).</p>
-        @endif
-    </div>
-
-    {{-- Peringatan stok --}}
-    <div class="card-fm mb-4">
-        <h2 class="section-title">Peringatan Stok Menipis</h2>
-
-        <div class="table-fm-wrap">
-            <table class="table-fm">
-                <thead>
-                    <tr>
-                        <th>Status</th>
-                        <th>Barang</th>
-                        <th>Stok</th>
-                        <th>Sisa</th>
-                        <th>Perkiraan Habis</th>
-                        <th>Saran Restok</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($perhatian as $s)
-                        <tr>
-                            <td><span class="badge-stok {{ $s['status'] }}">{{ $s['label'] }}</span></td>
-                            <td>{{ $s['nama'] }} <small class="text-muted-fm">{{ $s['kode'] }}</small></td>
-                            <td>{{ $s['stok'] }} <small class="text-muted-fm">{{ $s['satuan'] }}</small></td>
-                            <td>{{ $s['sisa_hari'] !== null ? number_format($s['sisa_hari'], 1, ',', '.') . ' hari' : '-' }}</td>
-                            <td>{{ $s['estimasi_habis'] ? \Carbon\Carbon::parse($s['estimasi_habis'])->format('d/m/Y') : '-' }}</td>
-                            <td class="fw-semibold">{{ $s['rekomendasi_restok'] ? '+' . $s['rekomendasi_restok'] . ' ' . $s['satuan'] : '-' }}</td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="text-center py-4 text-muted-fm">Tidak ada barang yang perlu perhatian stok.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
         </div>
-        <div class="small text-muted-fm mt-3">
-            Status dihitung dari prakiraan kebutuhan harian: Kritis jika stok habis dalam
-            {{ config('fahrimart.analisis.lead_time_hari') }} hari atau kurang, Waspada jika dalam
-            {{ config('fahrimart.analisis.lead_time_hari') + config('fahrimart.analisis.buffer_hari') }} hari atau kurang.
+
+        <div class="col-6 col-xl-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Omzet 7 hari terakhir</div>
+                <div class="kpi-nilai">{{ $rpRingkas($kpi['omzet_7_hari']) }}</div>
+                @if ($kpi['tren_persen'] !== null)
+                    <div class="kpi-sub {{ $kelas($kpi['tren_persen']) }}">{!! $panah($kpi['tren_persen']) !!} dari minggu sebelumnya</div>
+                @else
+                    <div class="kpi-sub">Belum ada pembanding</div>
+                @endif
+            </div>
+        </div>
+
+        <div class="col-6 col-xl-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Barang perlu perhatian stok</div>
+                <div class="kpi-nilai">{{ $perhatianTotal }} barang</div>
+                <div>
+                    @if ($kpi['habis'])<span class="kpi-chip habis">Habis {{ $kpi['habis'] }}</span>@endif
+                    @if ($kpi['kritis'])<span class="kpi-chip kritis">Kritis {{ $kpi['kritis'] }}</span>@endif
+                    @if ($kpi['waspada'])<span class="kpi-chip waspada">Waspada {{ $kpi['waspada'] }}</span>@endif
+                    @if ($perhatianTotal === 0)<span class="kpi-sub">Semua stok aman</span>@endif
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-xl-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Akurasi uji prakiraan</div>
+                <div class="kpi-nilai">{{ $akurasi !== null ? $akurasi . '%' : '-' }}</div>
+                <div class="kpi-sub">{{ $ramalan ? 'Model: ' . $ramalan['model'] : 'Data belum cukup' }}</div>
+            </div>
         </div>
     </div>
 
-    {{-- Insight --}}
+    {{-- ringkasan --}}
+    <div class="insight-ringkasan mb-4">{{ $insight['ringkasan'] }}</div>
+
+    {{-- langkah berikutnya --}}
     <div class="card-fm mb-4">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-            <h2 class="section-title mb-0">AI Sales Insight dan Langkah Berikutnya</h2>
-            <span class="label-sumber">
-                {{ $insight['sumber'] === 'llm' ? 'Sumber: AI (LLM)' : 'Sumber: analisis aturan' }}
-            </span>
+            <h3 class="ai-judul mb-0">Langkah Berikutnya</h3>
+            <span class="label-sumber">{{ $insight['sumber'] === 'llm' ? 'Disusun oleh AI (LLM)' : 'Disusun dari aturan analisis' }}</span>
         </div>
 
         @if (! empty($insight['llm_gagal']))
             <div class="alert alert-warning py-2 small">AI eksternal tidak tersedia, jadi yang ditampilkan adalah analisis berbasis aturan.</div>
         @endif
 
-        <div class="insight-ringkasan mb-3">{{ $insight['ringkasan'] }}</div>
-
-        @if (! empty($insight['temuan']))
-            <h3 class="h6 mt-4">Temuan</h3>
-            <ul class="mb-4">
-                @foreach ($insight['temuan'] as $t)
-                    <li>{{ $t }}</li>
-                @endforeach
-            </ul>
-        @endif
-
-        <h3 class="h6">Langkah Berikutnya (Next Step)</h3>
-        @forelse ($insight['next_steps'] as $langkah)
-            <div class="step-item">
-                <div><span class="badge-prio {{ $langkah['prioritas'] }}">{{ $langkah['prioritas'] }}</span></div>
-                <div>
-                    <div class="fw-semibold">{{ $langkah['tindakan'] }}</div>
-                    <div class="small text-muted-fm">{{ $langkah['alasan'] }}</div>
-                </div>
-            </div>
+        @forelse ($langkahUtama as $l)
+            @include('laporan._langkah', ['l' => $l])
         @empty
             <p class="text-muted-fm mb-0">Belum ada saran tindakan.</p>
         @endforelse
 
-        <div class="small text-muted-fm mt-3">
-            Prakiraan dan insight bersifat saran. Angka dihitung oleh sistem dari data penjualan, dan keputusan akhir tetap pada pemilik toko.
+        @if ($langkahLain)
+            <div class="collapse" id="langkahLain">
+                @foreach ($langkahLain as $l)
+                    @include('laporan._langkah', ['l' => $l])
+                @endforeach
+            </div>
+            <button type="button" class="btn btn-link px-0" data-bs-toggle="collapse" data-bs-target="#langkahLain">
+                Lihat {{ count($langkahLain) }} langkah lainnya
+            </button>
+        @endif
+    </div>
+
+    {{-- peringatan stok --}}
+    <div class="card-fm mb-4">
+        <h3 class="ai-judul mb-3">Barang yang Perlu Diisi Ulang</h3>
+
+        @forelse ($stokUtama as $s)
+            @include('laporan._stok', ['s' => $s])
+        @empty
+            <p class="text-muted-fm mb-0">Tidak ada barang yang perlu perhatian stok.</p>
+        @endforelse
+
+        @if ($stokLain->isNotEmpty())
+            <div class="collapse" id="stokLain">
+                @foreach ($stokLain as $s)
+                    @include('laporan._stok', ['s' => $s])
+                @endforeach
+            </div>
+            <button type="button" class="btn btn-link px-0 mt-2" data-bs-toggle="collapse" data-bs-target="#stokLain">
+                Lihat {{ $stokLain->count() }} barang lainnya
+            </button>
+        @endif
+    </div>
+
+    {{-- grafik prakiraan --}}
+    <div class="card-fm mb-4">
+        <h3 class="ai-judul mb-1">Prakiraan Omzet {{ $ramalan ? count($ramalan['tanggal']) : '' }} Hari ke Depan</h3>
+
+        @if ($ramalan)
+            <p class="small text-muted-fm mb-3">
+                Garis oranye putus-putus adalah prakiraan. Area hijau muda adalah rentang yang mungkin terjadi (kira-kira 80%). Omzet termasuk PPN.
+            </p>
+            <div class="chart-box"><canvas id="chartRamalan"></canvas></div>
+        @else
+            <p class="mb-0 text-muted-fm">Data penjualan belum cukup untuk membuat prakiraan (minimal 7 hari bertransaksi).</p>
+        @endif
+    </div>
+
+    {{-- temuan dan cara membaca --}}
+    <div class="card-fm mb-4">
+        <div class="accordion accordion-flush" id="akordeonAi">
+            @if (! empty($insight['temuan']))
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#temuanAi">
+                            Temuan lainnya ({{ count($insight['temuan']) }})
+                        </button>
+                    </h3>
+                    <div id="temuanAi" class="accordion-collapse collapse" data-bs-parent="#akordeonAi">
+                        <div class="accordion-body">
+                            <ul class="mb-0">
+                                @foreach ($insight['temuan'] as $t)
+                                    <li class="mb-1">{{ $t }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#caraBaca">
+                        Cara membaca analisis ini
+                    </button>
+                </h3>
+                <div id="caraBaca" class="accordion-collapse collapse" data-bs-parent="#akordeonAi">
+                    <div class="accordion-body small">
+                        <ul class="mb-0">
+                            <li class="mb-1"><strong>Habis:</strong> stok sudah 0.</li>
+                            <li class="mb-1"><strong>Kritis:</strong> stok diperkirakan habis dalam {{ $ac['lead_time_hari'] }} hari atau kurang (kira-kira waktu menunggu barang dari supplier tiba).</li>
+                            <li class="mb-1"><strong>Waspada:</strong> stok diperkirakan habis dalam {{ $ac['lead_time_hari'] + $ac['buffer_hari'] }} hari atau kurang.</li>
+                            <li class="mb-1"><strong>Saran restok:</strong> jumlah yang menutup {{ $ac['lead_time_hari'] }} hari masa tunggu, {{ $ac['target_cover_hari'] }} hari penjualan, dan {{ $ac['stok_pengaman_hari'] }} hari cadangan.</li>
+                            <li class="mb-1"><strong>Akurasi uji:</strong> model diuji pada 7 hari terakhir. Angkanya 100% dikurangi tingkat galat, jadi semakin tinggi semakin akurat.</li>
+                            <li class="mb-1"><strong>Sumber angka:</strong> semua angka dihitung oleh sistem dari data penjualan. Bila AI (LLM) aktif, ia hanya merangkum dan mengurutkan prioritas.</li>
+                            <li>Prakiraan dan saran bersifat masukan. Keputusan akhir tetap pada pemilik toko.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -250,7 +340,7 @@
         const sumbuY = (v) => v >= 1e6 ? (v / 1e6).toFixed(1).replace('.0', '') + ' jt' : (v >= 1e3 ? Math.round(v / 1e3) + ' rb' : v);
         const tooltip = { callbacks: { label: (c) => ' ' + c.dataset.label + ': Rp ' + rp(c.parsed.y) } };
 
-        // Tren penjualan
+        // tren penjualan
         const tren = @json($chartTren);
         new Chart(document.getElementById('chartTren'), {
             type: 'line',
@@ -274,7 +364,7 @@
             },
         });
 
-        // Prakiraan
+        // prakiraan
         const ram = @json($chartRamalan);
         const kanvas = document.getElementById('chartRamalan');
         if (ram && kanvas) {
@@ -286,7 +376,7 @@
                         { label: 'Aktual', data: ram.aktual, borderColor: '#40AA55', backgroundColor: '#40AA55', tension: 0.3, pointRadius: 3 },
                         { label: 'Prakiraan', data: ram.prediksi, borderColor: '#E97A06', backgroundColor: '#E97A06', borderDash: [6, 4], tension: 0.3, pointRadius: 3 },
                         { label: 'Batas bawah', data: ram.bawah, borderColor: 'transparent', pointRadius: 0, fill: false },
-                        { label: 'Rentang kepercayaan 80%', data: ram.atas, borderColor: 'transparent', backgroundColor: 'rgba(64,170,85,0.15)', pointRadius: 0, fill: '-1' },
+                        { label: 'Rentang yang mungkin terjadi', data: ram.atas, borderColor: 'transparent', backgroundColor: 'rgba(64,170,85,0.15)', pointRadius: 0, fill: '-1' },
                     ],
                 },
                 options: {

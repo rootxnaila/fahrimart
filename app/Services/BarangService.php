@@ -20,8 +20,14 @@ class BarangService
         ]);
 
         $id = DB::selectOne('SELECT LAST_INSERT_ID() AS id')->id;
+        $barang = Barang::findOrFail($id);
 
-        return Barang::findOrFail($id);
+        if (isset($data['foto'])) {
+            $barang->foto = $data['foto'];
+            $barang->save();
+        }
+
+        return $barang;
     }
 
     public function ubah(Barang $barang, array $data): Barang
@@ -34,6 +40,11 @@ class BarangService
             $data['harga_beli'],
             $data['harga_jual'],
         ]);
+
+        if (array_key_exists('foto', $data)) {
+            $barang->foto = $data['foto'];
+            $barang->save();
+        }
 
         return $barang->fresh();
     }
