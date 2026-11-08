@@ -8,7 +8,9 @@ use App\Http\Controllers\PosController;
 use App\Http\Controllers\ReturRusakController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TransaksiController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+
 
 Route::redirect('/', '/login');
 
@@ -71,3 +73,8 @@ Route::middleware(['auth', 'role:pemilik,admin'])
 Route::middleware(['auth', 'role:pemilik'])
     ->get('/uji/pemilik', fn () => 'Halaman khusus Pemilik')
     ->name('uji.pemilik');
+    
+    Route::get('/master/user', [UserController::class, 'index'])->name('master.user.index');
+Route::post('/master/user', [UserController::class, 'store'])->name('master.user.store');
+Route::put('/master/user/{id}', [UserController::class, 'update'])->name('master.user.update');
+Route::delete('/master/user/{id}', [UserController::class, 'destroy'])->name('master.user.destroy');

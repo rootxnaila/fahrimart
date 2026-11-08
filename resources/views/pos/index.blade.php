@@ -62,6 +62,7 @@
                 <span class="text-muted-fm small"><span id="cartCount">0</span> Item</span>
             </div>
 
+                        <div id="pesanKeranjang" class="alert alert-info py-2 small mt-3 mb-0 d-none" role="status"></div>
             <div class="cart-list" id="cartItems"></div>
 
             <div class="cart-ringkas">
@@ -183,6 +184,10 @@
         const URL_BAYAR = @json(route('pos.transaksi.store', [], false));
         const CSRF = @json(csrf_token());
 
+        // Keranjang disimpan di peramban, terpisah per pengguna, dan basi setelah 12 jam
+        const KUNCI = 'fahrimart.keranjang.v1.u{{ auth()->id() }}';
+        const BATAS_JAM = 12;
+
         const cart = new Map();          // id -> jumlah
         let metode = 'Tunai';
         let kategoriAktif = '';
@@ -198,6 +203,72 @@
         const modalStrukEl = $('modalStruk');
         const modalStruk = bootstrap.Modal.getOrCreateInstance(modalStrukEl);
 
+        /* ---------- Penyimpanan keranjang ---------- */
+        function simpanKeranjang() {
+            try {
+                if (cart.size === 0) {
+                    localStorage.removeItem(KUNCI);
+                } else {
+                    localStorage.setItem(KUNCI, JSON.stringify({ t: Date.now(), items: [...cart] }));
+                }
+            } catch (e) {
+                // Penyimpanan tidak tersedia: keranjang tetap berjalan di memori
+            }
+        }
+
+        /**
+         * Pulihkan keranjang dari penyimpanan lalu cocokkan dengan data terbaru:
+         * barang yang sudah tidak ada dibuang, jumlah dipotong sesuai stok.
+         */
+        function muatKeranjang() {
+            const hasil = { dipulihkan: 0, disesuaikan: false };
+            cart.clear();
+
+            let data = null;
+            try {
+                data = JSON.parse(localStorage.getItem(KUNCI));
+            } catch (e) {
+                return hasil;
+            }
+
+            if (!data || !Array.isArray(data.items)) return hasil;
+
+            if (Date.now() - Number(data.t || 0) > BATAS_JAM * 3600 * 1000) {
+                try { localStorage.removeItem(KUNCI); } catch (e) { /* abaikan */ }
+                return hasil;
+            }
+
+            data.items.forEach(([id, qty]) => {
+                id = String(id);
+                qty = parseInt(qty, 10);
+                const p = PRODUK[id];
+
+                if (!p || !(qty > 0)) { hasil.disesuaikan = true; return; }
+
+                const baru = Math.min(qty, p.stok);
+                if (baru <= 0) { hasil.disesuaikan = true; return; }
+                if (baru !== qty) hasil.disesuaikan = true;
+
+                cart.set(id, baru);
+            });
+
+            hasil.dipulihkan = cart.size;
+
+            return hasil;
+        }
+
+        function tampilPesanKeranjang(hasil) {
+            if (!hasil.dipulihkan && !hasil.disesuaikan) return;
+
+            const el = $('pesanKeranjang');
+            el.textContent = hasil.dipulihkan
+                ? 'Keranjang dipulihkan (' + hasil.dipulihkan + ' jenis barang).'
+                    + (hasil.disesuaikan ? ' Sebagian item disesuaikan dengan stok terbaru.' : '')
+                : 'Keranjang sebelumnya dikosongkan karena barangnya sudah tidak tersedia.';
+            el.classList.remove('d-none');
+            setTimeout(() => el.classList.add('d-none'), 8000);
+        }
+
         /* ---------- Perhitungan (server tetap menghitung ulang) ---------- */
         function hitung() {
             let jumlah = 0, subtotal = 0;
@@ -207,7 +278,7 @@
         }
 
         /* ---------- Keranjang ---------- */
-        function renderCart() {
+        function renderCart(simpan = true) {
             const box = $('cartItems');
 
             if (cart.size === 0) {
@@ -215,15 +286,9 @@
             } else {
                 box.innerHTML = [...cart].map(([id, qty]) => {
                     const p = PRODUK[id];
-                    
-                    // Cek ketersediaan foto untuk keranjang
-                    const thumbHtml = p.foto_url 
-                        ? `<img src="${p.foto_url}" alt="foto" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">` 
-                        : IKON;
-
                     return `
                         <div class="cart-row" data-id="${id}">
-                            <div class="cart-thumb">${thumbHtml}</div>
+                            <div class="cart-thumb">${IKON}</div>
                             <div class="cart-info">
                                 <div class="cart-nama">${esc(p.nama)}</div>
                                 <div class="cart-desk">${esc(p.satuan)}</div>
@@ -248,6 +313,8 @@
             $('sumPpn').textContent = rp(t.ppn);
             $('sumTotal').textContent = rp(t.total);
             $('btnBayar').disabled = cart.size === 0;
+
+            if (simpan) simpanKeranjang();
         }
 
         function tambah(id, jumlah) {
@@ -420,6 +487,8 @@
                 if (res.status === 201) {
                     // Perbarui stok di layar (stok asli diubah trigger di database)
                     snapshot.forEach(([id, qty]) => { PRODUK[id].stok -= qty; segarkanKartu(id); });
+
+                    // Kosongkan keranjang dan hapus dari penyimpanan
                     cart.clear();
                     renderCart();
 
@@ -432,7 +501,7 @@
                     const pesan = Object.values(json.errors || {}).flat().join(' ');
                     tampilPesan(pesan || json.message || 'Data tidak valid.');
                 } else if (res.status === 419) {
-                    tampilPesan('Sesi habis. Muat ulang halaman lalu coba lagi.');
+                    tampilPesan('Sesi habis. Muat ulang halaman lalu coba lagi (keranjang Anda tetap tersimpan).');
                 } else if (res.status === 403) {
                     tampilPesan('Anda tidak memiliki akses untuk transaksi ini.');
                 } else {
@@ -473,7 +542,17 @@
 
         $('btnCetak').addEventListener('click', () => window.print());
 
-        renderCart();
+        /* ---------- Sinkron antar tab ---------- */
+        window.addEventListener('storage', (e) => {
+            if (e.key !== null && e.key !== KUNCI) return;
+            muatKeranjang();
+            renderCart(false); // jangan simpan ulang agar tidak saling memicu antar tab
+        });
+
+        /* ---------- Mulai ---------- */
+        const awal = muatKeranjang();
+        renderCart(awal.disesuaikan); // simpan ulang hanya bila ada penyesuaian
+        tampilPesanKeranjang(awal);
     });
 </script>
 @endpush
