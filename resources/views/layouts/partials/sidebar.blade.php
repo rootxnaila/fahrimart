@@ -40,17 +40,22 @@
                     <svg class="nav-fm-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
                 </button>
                 <ul id="menuMaster" class="nav-fm-sub collapse {{ request()->routeIs('master.*') ? 'show' : '' }}">
-                    <li>
-                        <a href="{{ route('master.barang.index') }}" class="nav-fm-link {{ request()->routeIs('master.barang.*') ? 'active' : '' }}">Data Barang</a>
-                    </li>
-                    <li>
-                        <a href="{{ route('master.supplier.index') }}" class="nav-fm-link {{ request()->routeIs('master.supplier.*') ? 'active' : '' }}">Data Supplier</a>
-                    </li>
-                        <li>
-                            <a href="{{ route('master.user.index') }}" class="nav-fm-link {{ request()->routeIs('master.user.*') ? 'active' : '' }}">Kelola User</a>
-                        </li>
-                    
+    <li>
+        <a href="{{ route('master.barang.index') }}" class="nav-fm-link {{ request()->routeIs('master.barang.*') ? 'active' : '' }}">Data Barang</a>
+    </li>
+    <li>
+        <a href="{{ route('master.supplier.index') }}" class="nav-fm-link {{ request()->routeIs('master.supplier.*') ? 'active' : '' }}">Data Supplier</a>
+    </li>
+    
+    {{-- TAMBAHKAN BLOK @if INI KHUSUS UNTUK KELOLA USER --}}
+    @if ($role === 'pemilik')
+        <li>
+            <a href="{{ route('master.user.index') }}" class="nav-fm-link {{ request()->routeIs('master.user.*') ? 'active' : '' }}">Kelola User</a>
+        </li>
+    @endif
+        
                 </ul>
+                
             </li>
 
             {{-- Manajemen Stok --}}

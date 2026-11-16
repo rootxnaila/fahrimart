@@ -61,7 +61,6 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // laporan penjualan + analisis AI: hanya Pemilik dan Admin
-// Laporan penjualan + analisis AI: hanya Pemilik dan Admin
 Route::middleware(['auth', 'role:pemilik,admin'])
     ->prefix('laporan')
     ->name('laporan.')
@@ -70,11 +69,17 @@ Route::middleware(['auth', 'role:pemilik,admin'])
         Route::get('/pdf', [LaporanController::class, 'pdf'])->name('pdf');
         Route::post('/analisis', [LaporanController::class, 'perbarui'])->name('analisis.perbarui');
     });
+
 Route::middleware(['auth', 'role:pemilik'])
     ->get('/uji/pemilik', fn () => 'Halaman khusus Pemilik')
     ->name('uji.pemilik');
-    
-    Route::get('/master/user', [UserController::class, 'index'])->name('master.user.index');
-Route::post('/master/user', [UserController::class, 'store'])->name('master.user.store');
-Route::put('/master/user/{id}', [UserController::class, 'update'])->name('master.user.update');
-Route::delete('/master/user/{id}', [UserController::class, 'destroy'])->name('master.user.destroy');
+
+Route::middleware(['auth', 'role:pemilik'])
+    ->prefix('master')
+    ->name('master.')
+    ->group(function () {
+        Route::get('/user', [UserController::class, 'index'])->name('user.index');
+        Route::post('/user', [UserController::class, 'store'])->name('user.store');
+        Route::put('/user/{id}', [UserController::class, 'update'])->name('user.update');
+        Route::delete('/user/{id}', [UserController::class, 'destroy'])->name('user.destroy');
+    });
