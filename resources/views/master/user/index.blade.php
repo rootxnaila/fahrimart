@@ -221,6 +221,10 @@
                                             <label class="form-label text-muted small mb-1">Username</label>
                                             <input type="text" class="form-control" name="nama" value="{{ $user->nama }}" required autocomplete="off">
                                         </div>
+                                            <div class="mb-3">
+                                            <label class="form-label">Password <span class="text-muted small">(Kosongkan jika tidak ingin mengubah saat edit)</span></label>
+                                            <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Masukkan password baru">
+                                        </div>
                                         <div class="mb-3">
                                             <label class="form-label text-muted small mb-1">Role</label>
                                             <select class="form-select" name="role" required>
@@ -281,6 +285,10 @@
                         <input type="text" class="form-control" name="nama" placeholder="Ketik di sini" required autocomplete="off">
                     </div>
                     <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password" class="form-control input-fm" placeholder="Minimal 6 karakter" required>
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label text-muted small mb-1">Role</label>
                         <select class="form-select" name="role" required>
                             <option value="" disabled selected>Pilih Role</option>
@@ -306,6 +314,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- Script SweetAlert2 -->
 <script>
