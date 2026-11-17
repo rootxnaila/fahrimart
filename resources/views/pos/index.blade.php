@@ -286,9 +286,13 @@
             } else {
                 box.innerHTML = [...cart].map(([id, qty]) => {
                     const p = PRODUK[id];
+                    const thumb = p.foto_url
+                        ? `<img src="${esc(p.foto_url)}" alt="${esc(p.nama)}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
+                        : IKON;
+
                     return `
                         <div class="cart-row" data-id="${id}">
-                            <div class="cart-thumb">${IKON}</div>
+                            <div class="cart-thumb">${thumb}</div>
                             <div class="cart-info">
                                 <div class="cart-nama">${esc(p.nama)}</div>
                                 <div class="cart-desk">${esc(p.satuan)}</div>
